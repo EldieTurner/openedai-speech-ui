@@ -25,7 +25,7 @@ This project is a Blazor WebAssembly application targeting .NET 8.0 It provides 
 
 ### Docker
 You can download the docker image from Docker Hub: [eldieturner/openedai-speech-ui](https://hub.docker.com/r/eldieturner/openedai-speech-ui)
-```bash]
+
 ## Usage
 1. Open your browser and navigate to `https://localhost:5001`.
 2. Enter the text you want to convert to speech.
