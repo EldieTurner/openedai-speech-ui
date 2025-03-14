@@ -3,88 +3,177 @@
     ViewData["Title"] = "Text-to-Speech Converter";
 }
 
-<h2>@ViewData["Title"]</h2>
+<!-- Bootstrap CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
 
-<form asp-action="Index" method="post">
-    <div>
-        <label for="Request.Input">Text to Convert:</label><br />
-        <textarea id="Request.Input" name="Request.Input" rows="10" cols="80">@Model.Request.Input</textarea>
-        <span asp-validation-for="Request.Input" class="text-danger"></span>
+<style>
+    /* Compact Layout */
+    body {
+        font-size: 14px;
+    }
+
+    .tts-container {
+        display: flex;
+        gap: 10px;
+        align-items: start;
+    }
+
+    .tts-textarea {
+        height: 300px;
+        resize: none;
+    }
+
+    .tts-controls {
+        width: 300px;
+        flex-shrink: 0;
+    }
+
+    .audio-container {
+        padding: 10px;
+        border-radius: 5px;
+        background-color: var(--bs-gray-200);
+    }
+
+    /* Dark Mode */
+    body.dark-mode {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .form-control, 
+    body.dark-mode .form-select {
+        background-color: #333;
+        color: #fff;
+        border: 1px solid #666;
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #007bff;
+        border: none;
+    }
+
+    body.dark-mode .audio-container, 
+    body.dark-mode .advanced-options {
+        background-color: #222;
+        color: #fff;
+    }
+</style>
+
+<div class="container my-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h2>@ViewData["Title"]</h2>
+
+        <!-- Dark Mode Toggle -->
+        <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" id="darkModeToggle">
+            <label class="form-check-label" for="darkModeToggle">Dark Mode</label>
+        </div>
     </div>
 
-    <div>
-        <label for="Request.Model">Model:</label>
-        <select id="Request.Model" name="Request.Model">
-            <option value="tts-1" selected="@(Model.Request.Model == "tts-1")">tts-1 (Piper)</option>
-            <option value="tts-1-hd" selected="@(Model.Request.Model == "tts-1-hd")">tts-1-hd (High Definition)</option>
-        </select>
-    </div>
+    <form asp-action="Index" method="post" class="tts-container mt-2">
+        <!-- Left: Text Input -->
+        <div class="flex-grow-1">
+            <label for="Request.Input" class="form-label fw-bold">Text to Convert</label>
+            <textarea id="Request.Input" name="Request.Input" class="form-control tts-textarea">@Model.Request.Input</textarea>
+            <span asp-validation-for="Request.Input" class="text-danger"></span>
 
-    <div>
-        <label for="Request.Voice">Voice:</label>
-        <select id="Request.Voice" name="Request.Voice">
-            <option value="alloy" selected="@(Model.Request.Voice == "alloy")">alloy</option>
-            <option value="echo" selected="@(Model.Request.Voice == "echo")">echo</option>
-            <option value="fable" selected="@(Model.Request.Voice == "fable")">fable</option>
-            <option value="onyx" selected="@(Model.Request.Voice == "onyx")">onyx</option>
-            <option value="nova" selected="@(Model.Request.Voice == "nova")">nova</option>
-            <option value="shimmer" selected="@(Model.Request.Voice == "shimmer")">shimmer</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="Request.ResponseFormat">Response Format:</label>
-        <select id="Request.ResponseFormat" name="Request.ResponseFormat">
-            <option value="mp3" selected="@(Model.Request.ResponseFormat == "mp3")">mp3</option>
-            <option value="opus" selected="@(Model.Request.ResponseFormat == "opus")">opus</option>
-            <option value="aac" selected="@(Model.Request.ResponseFormat == "aac")">aac</option>
-            <option value="flac" selected="@(Model.Request.ResponseFormat == "flac")">flac</option>
-            <option value="wav" selected="@(Model.Request.ResponseFormat == "wav")">wav</option>
-            <option value="pcm" selected="@(Model.Request.ResponseFormat == "pcm")">pcm</option>
-        </select>
-    </div>
-
-    <div>
-        <label for="Request.Speed">Speed:</label>
-        <input type="number" step="0.1" id="Request.Speed" name="Request.Speed" value="@Model.Request.Speed" />
-    </div>
-
-    <fieldset>
-        <legend>Advanced Options (for tts-1-hd model)</legend>
-        <div>
-            <label for="Request.Temperature">Temperature:</label>
-            <input type="number" step="0.01" id="Request.Temperature" name="Request.Temperature" value="@Model.Request.Temperature" />
+            <!-- Audio Playback BELOW text box -->
+            @if (!string.IsNullOrEmpty(Model.AudioFilePath))
+            {
+                <div class="audio-container mt-2">
+                    <h6>Audio Playback</h6>
+                    <audio controls class="w-100">
+                        <source src="@Model.AudioFilePath" type="audio/mpeg" />
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+            }
         </div>
-        <div>
-            <label for="Request.TopP">Top P:</label>
-            <input type="number" step="0.01" id="Request.TopP" name="Request.TopP" value="@Model.Request.TopP" />
-        </div>
-        <div>
-            <label for="Request.TopK">Top K:</label>
-            <input type="number" id="Request.TopK" name="Request.TopK" value="@Model.Request.TopK" />
-        </div>
-        <div>
-            <label for="Request.LengthPenalty">Length Penalty:</label>
-            <input type="number" step="0.01" id="Request.LengthPenalty" name="Request.LengthPenalty" value="@Model.Request.LengthPenalty" />
-        </div>
-        <div>
-            <label for="Request.RepetitionPenalty">Repetition Penalty:</label>
-            <input type="number" step="0.01" id="Request.RepetitionPenalty" name="Request.RepetitionPenalty" value="@Model.Request.RepetitionPenalty" />
-        </div>
-    </fieldset>
 
-    <button type="submit">Convert to Speech</button>
-</form>
+        <!-- Right: Controls -->
+        <div class="tts-controls">
+            <div class="mb-2">
+                <label class="form-label fw-bold">Model</label>
+                <select name="Request.Model" class="form-select">
+                    <option value="tts-1" selected="@(Model.Request.Model == "tts-1")">tts-1 (Piper)</option>
+                    <option value="tts-1-hd" selected="@(Model.Request.Model == "tts-1-hd")">tts-1-hd (High Definition)</option>
+                </select>
+            </div>
 
-@if (!string.IsNullOrEmpty(Model.AudioFilePath))
-{
-    <h3>Audio Playback</h3>
-    <audio controls>
-        <source src="@Model.AudioFilePath" type="audio/mpeg" />
-        Your browser does not support the audio element.
-    </audio>
-}
+            <div class="mb-2">
+                <label class="form-label fw-bold">Voice</label>
+                <select name="Request.Voice" class="form-select">
+                    <option value="alloy" selected="@(Model.Request.Voice == "alloy")">alloy</option>
+                    <option value="echo" selected="@(Model.Request.Voice == "echo")">echo</option>
+                    <option value="fable" selected="@(Model.Request.Voice == "fable")">fable</option>
+                    <option value="onyx" selected="@(Model.Request.Voice == "onyx")">onyx</option>
+                    <option value="nova" selected="@(Model.Request.Voice == "nova")">nova</option>
+                    <option value="shimmer" selected="@(Model.Request.Voice == "shimmer")">shimmer</option>
+                </select>
+            </div>
+            <div class="mb-2">
+                <label for="Request.ResponseFormat" class="form-label fw-bold">Response Format:</label>
+                <select id="Request.ResponseFormat" name="Request.ResponseFormat" class="form-select">
+                    <option value="mp3" selected="@(Model.Request.ResponseFormat == "mp3")">mp3</option>
+                    <option value="opus" selected="@(Model.Request.ResponseFormat == "opus")">opus</option>
+                    <option value="aac" selected="@(Model.Request.ResponseFormat == "aac")">aac</option>
+                    <option value="flac" selected="@(Model.Request.ResponseFormat == "flac")">flac</option>
+                    <option value="wav" selected="@(Model.Request.ResponseFormat == "wav")">wav</option>
+                    <option value="pcm" selected="@(Model.Request.ResponseFormat == "pcm")">pcm</option>
+                </select>
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label fw-bold">Speed</label>
+                <input type="number" step="0.1" name="Request.Speed" class="form-control" value="@Model.Request.Speed" />
+            </div>
+
+            <!-- Advanced Options -->
+            <div class="p-2 rounded advanced-options">
+                <h6 class="fw-bold">Advanced Options</h6>
+                <div class="mb-2">
+                    <label class="form-label">Temperature</label>
+                    <input type="number" step="0.01" name="Request.Temperature" class="form-control" value="@Model.Request.Temperature" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Top P</label>
+                    <input type="number" step="0.01" name="Request.TopP" class="form-control" value="@Model.Request.TopP" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Top K</label>
+                    <input type="number" name="Request.TopK" class="form-control" value="@Model.Request.TopK" />
+                </div>
+            </div>
+
+            <!-- Convert Button -->
+            <div class="text-center mt-3">
+                <button type="submit" class="btn btn-primary px-3 py-2 w-100">Convert to Speech</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+
+<!-- Bootstrap & Dark Mode Script -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Dark Mode Toggle
+    const toggle = document.getElementById("darkModeToggle");
+    toggle.addEventListener("change", function () {
+        document.body.classList.toggle("dark-mode", toggle.checked);
+        localStorage.setItem("darkMode", toggle.checked ? "enabled" : "disabled");
+
+        // Apply dark mode to Advanced Options explicitly
+        document.querySelector(".advanced-options").classList.toggle("dark-mode", toggle.checked);
+    });
+
+    // Load Dark Mode Preference
+    if (localStorage.getItem("darkMode") === "enabled") {
+        document.body.classList.add("dark-mode");
+        toggle.checked = true;
+        document.querySelector(".advanced-options").classList.add("dark-mode");
+    }
+</script>
