@@ -1,5 +1,7 @@
 # openedai-speech-ui
+
 [![Build and Push Docker Image]()](https://github.com/EldieTurner/openedai-speech-ui/actions/workflows/docker-build.yml)
+
 A basic Web UI for using OpenAI Speech API for text-to-speech.
 
 ## Project Overview
