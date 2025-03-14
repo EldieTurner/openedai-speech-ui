@@ -29,7 +29,8 @@ jobs:
     - name: Build and Push Docker Image
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: openedai-speech-ui/src/OpenedAiSpeechUI  # Path where Dockerfile is located
+        file: openedai-speech-ui/src/OpenedAiSpeechUI/Dockerfile  # Explicitly set Dockerfile location
         push: true
         tags: eldieturner/openedai-speech-ui:latest
         platforms: linux/amd64
